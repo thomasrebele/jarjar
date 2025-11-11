@@ -1,0 +1,8 @@
+
+dependencies {
+    implementation project(':jarjar-core')
+
+    implementation 'org.apache.commons:commons-compress:1.9'
+    implementation gradleApi()
+    implementation "oro:oro:2.0.8"
+}

@@ -9,6 +9,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import javax.annotation.Nonnull;
@@ -22,9 +23,19 @@ public class AbstractJarTransformerTest {
 
     @Nonnull
     protected static File newJar(String propertyName) {
-        return new File(System.getProperty(propertyName));
+      String fileName = System.getProperty(propertyName);
+      //Objects.requireNonNull(fileName, "no property for " + propertyName);
+      switch(propertyName) {
+      case "jar0": fileName = "/home/trebele/dev/other/jarjar/jarjar-testdata/build/libs/jarjar-testdata-1.0.2-SNAPSHOT-jar0.jar"; break;
+      case "jar1": fileName = "/home/trebele/dev/other/jarjar/jarjar-testdata/build/libs/jarjar-testdata-1.0.2-SNAPSHOT-jar1.jar"; break;
+      case "jar2": fileName = "/home/trebele/dev/other/jarjar/jarjar-testdata/build/libs/jarjar-testdata-1.0.2-SNAPSHOT-jar2.jar"; break;
+      case "jar3": fileName = "/home/trebele/dev/other/jarjar/jarjar-testdata/build/libs/jarjar-testdata-1.0.2-SNAPSHOT-jar3.jar"; break;
+      default: throw new IllegalArgumentException(propertyName);
+
+      }
+      return new File(fileName);
     }
-    protected final File jar = newJar("jar");
+    //protected final File jar = newJar("jar");
     protected final File[] jars = new File[]{
         newJar("jar0"),
         newJar("jar1"),

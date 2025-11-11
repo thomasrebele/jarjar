@@ -1,112 +1,105 @@
-buildscript {
-	// Executed in context of buildscript
-	repositories {
-		// mavenLocal()
-		mavenCentral()
-		// jcenter()
-		// maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-		gradlePluginPortal()
-	}
 
-	dependencies {
-		classpath 'org.anarres.gradle:gradle-stdproject-plugin:1.0.10'
-	}
+allprojects {
+    // Executed in context of buildscript
+    repositories {
+        // mavenLocal()
+        mavenCentral()
+        // jcenter()
+        // maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        gradlePluginPortal()
+    }
+
+    apply plugin: 'java'
+
+    dependencies {
+        implementation 'com.google.code.findbugs:annotations:3.0.1'
+
+        testImplementation('junit:junit:4.13')
+    }
 }
 
-
-apply plugin: 'org.anarres.stdproject'
-stdproject {
-}
-
-subprojects {
-        version = '1.1.1'
-	apply plugin: 'org.anarres.stdmodule'
-	apply plugin: 'eclipse'
-	stdmodule {
-		description "Jar Jar Links is a utility that makes it easy to repackage Java libraries and embed them into your own distribution."
-		author id: 'shevek', name: 'Shevek', email: 'github@anarres.org'
-		license 'Apache-2.0'
-	}
-
-	group = "org.anarres.jarjar"
-
-	dependencies {
-		compile 'com.google.code.findbugs:annotations:3.0.1'
-		compile 'org.slf4j:slf4j-api:1.7.12'
-	}
-
-	sourceCompatibility = 1.7
-}
-
-version = '1.1.1'
-
-project(':jarjar-testdata') {
-	dependencies {
-		compile 'com.google.guava:guava:17.0'
-	}
-
-	for (int i = 0; i < 4; i++) {
-		String name = "jar$i";
-		Task t = task(name, type: Jar) {
-			classifier = name
-			from(sourceSets.main.output) {
-				include "**/pkg$i/**";
-			}
-		}
-
-		artifacts {
-			archives t
-		}
-	}
-
-	uploadArchives.enabled = false
-}
-
-project(':jarjar-core') {
-	dependencies {
-		compile 'org.ow2.asm:asm-commons:8.0.1'
-		compile 'org.ow2.asm:asm-util:8.0.1'
-		// compile 'org.ow2.asm:asm-commons:4.0'
-
-		// testCompile project(':jarjar-testdata')
-	}
-
-	def samplesProject = project(':jarjar-testdata')
-	test.dependsOn samplesProject.tasks['assemble']
-	test {
-		systemProperty "jar", samplesProject.jar.archivePath
-		for (int i = 0; i < 4; i++) {
-			systemProperty "jar$i", samplesProject."jar$i".archivePath
-		}
-	}
-}
-
-project(':jarjar-gradle') {
-	apply plugin: 'org.anarres.stdplugin'
-
-	stdplugin {
-		implementation "org.anarres.jarjar", "org.anarres.gradle.plugin.jarjar.JarjarPlugin"
-	}
-
-	dependencies {
-		compile project(':jarjar-core')
-		compile 'org.apache.commons:commons-compress:1.9'
-		compile gradleApi()
-		compile 'oro:oro:2.0.8'
-
-		testCompile project(':jarjar-core').sourceSets.test.output
-	}
-}
-
-project(':jarjar-command') {
-	dependencies {
-		compile project(':jarjar-core')
-		compile 'net.sf.jopt-simple:jopt-simple:4.8'
-
-		testCompile project(':jarjar-core').sourceSets.test.output
-	}
-
-	apply plugin: 'application'
-
-	mainClassName = "com.tonicsystems.jarjar.Main"
-}
+//dependencies {
+//    implementation 'com.google.code.findbugs:annotations:3.0.1'
+//    implementation 'org.slf4j:slf4j-api:1.7.12'
+//}
+//
+////subprojects {
+////        version = '1.1.1'
+////	apply plugin: 'eclipse'
+////	group = "org.anarres.jarjar"
+////	sourceCompatibility = 1.7
+////}
+//
+//version = '1.1.1'
+//
+//project(':jarjar-testdata') {
+//	dependencies {
+//		compile 'com.google.guava:guava:17.0'
+//	}
+//
+//	for (int i = 0; i < 4; i++) {
+//		String name = "jar$i";
+//		Task t = task(name, type: Jar) {
+//			classifier = name
+//			from(sourceSets.main.output) {
+//				include "**/pkg$i/**";
+//			}
+//		}
+//
+//		artifacts {
+//			archives t
+//		}
+//	}
+//
+//	uploadArchives.enabled = false
+//}
+//
+//project(':jarjar-core') {
+//	dependencies {
+//		compile 'org.ow2.asm:asm-commons:8.0.1'
+//		compile 'org.ow2.asm:asm-util:8.0.1'
+//		// compile 'org.ow2.asm:asm-commons:4.0'
+//
+//		// testCompile project(':jarjar-testdata')
+//	}
+//
+//	def samplesProject = project(':jarjar-testdata')
+//	test.dependsOn samplesProject.tasks['assemble']
+//	test {
+//		systemProperty "jar", samplesProject.jar.archivePath
+//		for (int i = 0; i < 4; i++) {
+//			systemProperty "jar$i", samplesProject."jar$i".archivePath
+//		}
+//	}
+//}
+//
+//project(':jarjar-gradle') {
+//	apply plugin: 'org.anarres.stdplugin'
+//
+//	stdplugin {
+//		implementation "org.anarres.jarjar", "org.anarres.gradle.plugin.jarjar.JarjarPlugin"
+//	}
+//
+//	dependencies {
+//		compile project(':jarjar-core')
+//		compile 'org.apache.commons:commons-compress:1.9'
+//		compile gradleApi()
+//		compile 'oro:oro:2.0.8'
+//
+//		testCompile project(':jarjar-core').sourceSets.test.output
+//	}
+//}
+//
+//project(':jarjar-command') {
+//	dependencies {
+//		compile project(':jarjar-core')
+//		compile 'net.sf.jopt-simple:jopt-simple:4.8'
+//
+//		testCompile project(':jarjar-core').sourceSets.test.output
+//	}
+//
+//	apply plugin: 'application'
+//
+//	mainClassName = "com.tonicsystems.jarjar.Main"
+//}
+//

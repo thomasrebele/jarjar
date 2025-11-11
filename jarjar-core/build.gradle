@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    implementation 'org.ow2.asm:asm-commons:9.8'
+    implementation 'org.ow2.asm:asm-util:9.8'
+    implementation 'org.slf4j:slf4j-api:1.7.12'
+
+}
