@@ -25,11 +25,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import javax.annotation.Nonnull;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +48,6 @@ public class JarTransformer {
     private final JarProcessor processor;
     private DuplicatePolicy duplicatePolicy = DuplicatePolicy.DISCARD;
     private final byte[] buf = new byte[0x2000];
-    private final Set<String> dirs = new HashSet<String>();
     private final Set<String> files = new HashSet<String>();
 
     public JarTransformer(@Nonnull File outputFile, @Nonnull JarProcessor processor) {
@@ -72,16 +74,6 @@ public class JarTransformer {
         return struct;
     }
 
-    private void addDirs(JarOutputStream outputJarStream, String name) throws IOException {
-        int dirIdx = name.lastIndexOf('/');
-        if (dirIdx == -1)
-            return;
-        String dirName = name.substring(0, dirIdx + 1);
-        if (dirs.add(dirName)) {
-            JarEntry dirEntry = new JarEntry(dirName);
-            outputJarStream.putNextEntry(dirEntry);
-        }
-    }
 
     public void transform(@Nonnull ClassPath inputPath) throws IOException {
 
@@ -98,17 +90,13 @@ public class JarTransformer {
 
         OUT:
         {
-            Set<String> dirs = new HashSet<String>();
-
-            JarOutputStream outputJarStream = new JarOutputStream(new FileOutputStream(outputFile));
+            DirWriter writer = DirWriter.create(outputFile);
             for (ClassPathArchive inputArchive : inputPath) {
                 LOG.info("Transforming archive {}", inputArchive);
                 for (ClassPathResource inputResource : inputArchive) {
                     Transformable struct = newTransformable(inputResource);
                     if (processor.process(struct) == JarProcessor.Result.DISCARD)
                         continue;
-
-                    addDirs(outputJarStream, struct.name);
 
                     if (DuplicatePolicy.DISCARD.equals(duplicatePolicy)) {
                         if (!files.add(struct.name)) {
@@ -118,14 +106,10 @@ public class JarTransformer {
                     }
 
                     LOG.debug("Writing {}", struct.name);
-                    JarEntry outputEntry = new JarEntry(struct.name);
-                    outputEntry.setTime(struct.time);
-                    outputEntry.setCompressedSize(-1);
-                    outputJarStream.putNextEntry(outputEntry);
-                    outputJarStream.write(struct.data);
+                    writer.writeFile(struct);
                 }
             }
-            outputJarStream.close();
+            writer.close();
         }
 
     }
