@@ -66,6 +66,7 @@ public class ClassTransformerJarProcessor implements JarProcessor {
                 struct.data = writer.toByteArray();
             } catch (Exception e) {
                 LOG.warn("Failed to read class " + struct.name + ": " + e);
+                throw e;
             }
         }
         return Result.KEEP;
