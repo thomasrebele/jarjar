@@ -22,13 +22,11 @@ public interface DirWriter extends AutoCloseable {
         return isDir ? new DirWriter.FSWriter(file.toPath()) : new DirWriter.JarWriter(file);
     }
 
-    @Nullable
     private static String getDirname(String name) {
         int dirIdx = name.lastIndexOf('/');
         if (dirIdx == -1)
             return null;
-        String dirName = name.substring(0, dirIdx + 1);
-        return dirName;
+        return name.substring(0, dirIdx + 1);
     }
 
     default void mkdirs(Transformable t) throws IOException {

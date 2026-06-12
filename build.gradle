@@ -19,9 +19,12 @@ allprojects {
 
 }
 
-project(":jarjar-core").tasks.named('test') {
-    (0..3).each { i ->
-        dependsOn project(':jarjar-testdata').tasks.named("jar$i")
+for (int i = 0; i < 4; i++) {
+    tasks.named('test') {
+        dependsOn project(':jarjar-testdata').tasks.named('jar0')
+        dependsOn project(':jarjar-testdata').tasks.named('jar1')
+        dependsOn project(':jarjar-testdata').tasks.named('jar2')
+        dependsOn project(':jarjar-testdata').tasks.named('jar3')
     }
 }
 
